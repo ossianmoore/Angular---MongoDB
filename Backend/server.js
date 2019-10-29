@@ -3,6 +3,20 @@ const app = express();
 const bodyParser = require('body-parser');
 const PORT = 4000;
 const cors = require('cors');
+const mongoose = require('mongoose');
+
+const mongoDB = 'mongodb+srv://admin:admin@angulardbom-rv0es.mongodb.net/test?retryWrites=true&w=majority';
+mongoose.connect(mongoDB, {useNewUrlParser:true});
+
+const Schema = mongoose.Schema;
+
+const movieSchema = new Schema({
+  title:String,
+  year:String,
+  poster:String
+});
+
+const MovieModel = mongoose.model('movie', movieSchema);
 
 app.use(cors());
 app.use(bodyParser.urlencoded({ extended: true }));
@@ -58,12 +72,12 @@ app.get('/api/movies', (req,res,next) => {
         "Poster":"https://m.media-amazon.com/images/M/MV5BNDUyODAzNDI1Nl5BMl5BanBnXkFtZTcwMDA2NDAzMw@@._V1_SX300.jpg"
         }
         ];
-  console.log("get request")
-  res.status(200).json({
-    message: 'Posts fetched succesfully!',
-    movies: movies
-  });
+
+MovieModel.find((err,data)=>{
+  res.json({movies:data});
 })
+
+});
 
 app.post('/api/movies', (req, res) =>{
 console.log('post Sucessfull');
@@ -71,6 +85,14 @@ console.log(req.body)
 console.log(req.body.title);
 console.log(req.body.year);
 console.log(req.body.poster);
+
+MovieModel.create({
+  title: req.body.title,
+  year: req.body.year,
+  poster: req.body.poster
+});
+res.json('data uploaded')
+
 })
 
 
